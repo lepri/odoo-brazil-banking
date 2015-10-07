@@ -46,6 +46,8 @@ class Santander240(Cnab240):
         :return:
         """
         vals = super(Santander240, self)._prepare_header()
+        vals['mensagem1'] = self.order.mode.instrucoes
+        vals['mensagem2'] = self.order.mode.instrucoes2
         del vals['arquivo_hora_de_geracao']
         return vals
 
@@ -56,4 +58,9 @@ class Santander240(Cnab240):
         :return:
         """
         vals = super(Santander240, self)._prepare_segmento(line)
+        vals['servico_codigo_movimento'] = 1  # 01 - Entrada de titulo
+        vals['tipo_documento'] = self.order.mode.boleto_especie
+        if self.order.mode.boleto_type == '10':
+            vals['forma_cadastramento'] = 1  # atribui como boleto registrado caso o boleto_type seja igual a 10
+
         return vals
