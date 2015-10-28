@@ -35,7 +35,8 @@ class PaymentMode(models.Model):
          ('99', 'Outros')],
         string='Tipo SPED', required=True, default='99')
     internal_sequence_id = fields.Many2one('ir.sequence', u'Sequência')
-    instrucoes = fields.Text(u'Instruções de cobrança')
+    instrucoes = fields.Text(u'Instruções de cobrança', size=40)
+    instrucoes2 = fields.Text(u'Instruções de cobrança (campo 2)', size=40)
     invoice_print = fields.Boolean(
         u'Gerar relatorio na conclusão da fatura?')
 

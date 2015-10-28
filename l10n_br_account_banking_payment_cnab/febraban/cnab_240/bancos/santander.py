@@ -23,6 +23,9 @@
 ##############################################################################
 
 from ..cnab_240 import Cnab240
+import re
+import string
+from decimal import *
 
 
 class Santander240(Cnab240):
@@ -41,7 +44,6 @@ class Santander240(Cnab240):
 
     def _prepare_header(self):
         """
-
         :param order:
         :return:
         """
@@ -58,9 +60,34 @@ class Santander240(Cnab240):
         :return:
         """
         vals = super(Santander240, self)._prepare_segmento(line)
+
+        carteira, nosso_numero, digito = self.nosso_numero(
+            line.move_line_id.transaction_ref)
+
         vals['servico_codigo_movimento'] = 1  # 01 - Entrada de titulo
-        vals['tipo_documento'] = self.order.mode.boleto_especie
+        vals['tipo_documento'] = int(self.order.mode.boleto_especie)
         if self.order.mode.boleto_type == '10':
-            vals['forma_cadastramento'] = 1  # atribui como boleto registrado caso o boleto_type seja igual a 10
+            vals['forma_cadastramento'] = 1  # boleto registrado caso o boleto_type seja igual a 10 #TODO melhorar
+            vals['tipo_cobranca'] = 5
+        vals['carteira_numero'] = int(carteira)
+        vals['nosso_numero'] = int(nosso_numero)
+        vals['nosso_numero_dv'] = int(digito)
+        vals['sacado_endereco'] = vals['sacado_endereco'][:40]
+        vals['mensagem_recibo_pagador'] = 2
+        vals['mensagem1'] = self.order.mode.instrucoes[:100]
+        vals['mensagem2'] = self.order.mode.instrucoes2
+        vals['conta_cobranca'] = int(self.order.mode.bank_id.acc_number)
+        vals['conta_cobranca_dv'] = int(self.order.mode.bank_id.acc_number_dig)
+        vals['codigo_juros_mora'] = int(self.order.mode.boleto_mora)
+        vals['juros_mora_data'] = self.format_date(line.ml_maturity_date)
+        vals['juros_mora_taxa'] = Decimal("{0:,.2f}".format(float(self.order.mode.boleto_mora_juros)))
 
         return vals
+
+    def nosso_numero(self, format):
+        digito = format[-1:]
+        if self.order.mode.boleto_type == '10':
+            carteira = 5
+        nosso_numero = re.sub(
+            '[%s]' % re.escape(string.punctuation), '', format[3:-1] or '')
+        return carteira, nosso_numero, digito

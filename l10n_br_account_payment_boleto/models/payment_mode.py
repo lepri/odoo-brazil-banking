@@ -39,31 +39,45 @@ class PaymentMode(models.Model):
         [('S', 'Sim'), ('N', 'Não')], string='Aceite', default='N')
     boleto_type = fields.Selection(
         selection, string="Boleto")
+    boleto_tipo_documento = fields.Selection([
+        ('1', u'Tradicional'),
+        ('2', u'Escritural')
+    ], string=u'Tipo de Documento', default='1')
     boleto_especie = fields.Selection([
-        ('01', u'DUPLICATA MERCANTIL'),
-        ('02', u'NOTA PROMISSÓRIA'),
-        ('03', u'NOTA DE SEGURO'),
-        ('04', u'MENSALIDADE ESCOLAR'),
-        ('05', u'RECIBO'),
-        ('06', u'CONTRATO'),
-        ('07', u'COSSEGUROS'),
-        ('08', u'DUPLICATA DE SERVIÇO'),
-        ('09', u'LETRA DE CÂMBIO'),
-        ('13', u'NOTA DE DÉBITOS'),
-        ('15', u'DOCUMENTO DE DÍVIDA'),
-        ('16', u'ENCARGOS CONDOMINIAIS'),
-        ('17', u'CONTA DE PRESTAÇÃO DE SERVIÇOS'),
-        ('99', u'DIVERSOS'),
+        ('02', u'DM - Duplicada Mercantil'),
+        ('04', u'DS - Duplicada de Serviço'),
+        ('12', u'NP - Nota Promissória'),
+        ('13', u'NR - Nota Promissória Rural'),
+        ('17', u'RC - Recibo'),
+        ('20', u'AP - Apólice de Seguro'),
+        ('32', u'BDP - Boleto de Proposta'),
+        ('97', u'CH - Cheque'),
+        ('98', u'ND - Nota Promissória Direta'),
     ], string=u'Espécie do Título', default='01')
     boleto_protesto = fields.Selection([
-        ('0', u'Sem instrução'),
+        ('0', u'Não Protestar'),
         ('1', u'Protestar (Dias Corridos)'),
         ('2', u'Protestar (Dias Úteis)'),
-        ('3', u'Não protestar'),
-        ('7', u'Negativar (Dias Corridos)'),
-        ('8', u'Não Negativar')
-    ], string=u'Códigos de Protesto', default='0')
+        ('3', u'Utilizar Perfil Beneficiário'),
+        ('8', u'Cancelamento de Protesto Automático')
+    ], string=u'Códigos para Protesto', default='0')
     boleto_protesto_prazo = fields.Char(u'Prazo protesto', size=2)
+    boleto_baixa = fields.Selection([
+        ('1', u'Baixar/Devolver'),
+        ('2', u'Não Baixar/Não Devolver'),
+        ('3', u'Utilizar Perfil Beneficiário')
+    ], string=u'Código para Baixa/Devolução', default='1')
+    boleto_baixa_prazo = fields.Char(u'Número de dias para Baixa/Devolução ', size=2)
+    boleto_mora = fields.Selection([
+        ('1', u'Valor por dia - Informar no campo o valor/dia a mora a ser cobrada.'),
+        ('2', u'Taxa Mensal - Informar no campo taxa mensal o percentual a ser aplicado sobre valor do titulo que será'
+              u' calculado por dia de atraso.'),
+        ('3', u'Isento'),
+        ('4', u'Utilizar comissão permanência do Banco por dia de atraso'),
+        ('5', u'Tolerância valor por dia (cobrar juros a partir de'),
+        ('6', u'Tolerância taxa mensal (cobrar juros a partir de')
+    ], string=u'Código para juros de Mora', default='3')
+    boleto_mora_juros = fields.Char(u'Juros de Mora', help=u'Informe o juro usando ponto e não vírgula.', size=5)
 
     @api.constrains('boleto_type', 'boleto_carteira',
                     'boleto_modalidade', 'boleto_convenio',
