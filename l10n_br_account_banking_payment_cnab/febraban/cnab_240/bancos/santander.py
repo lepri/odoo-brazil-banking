@@ -70,7 +70,7 @@ class Santander240(Cnab240):
             vals['forma_cadastramento'] = 1  # boleto registrado caso o boleto_type seja igual a 10 #TODO melhorar
             vals['tipo_cobranca'] = 5
         vals['carteira_numero'] = int(carteira)
-        vals['nosso_numero'] = int(nosso_numero)
+        vals['nosso_numero'] = int(nosso_numero + digito)
         vals['nosso_numero_dv'] = int(digito)
         vals['sacado_endereco'] = vals['sacado_endereco'][:40]
         vals['mensagem_recibo_pagador'] = 2
@@ -81,6 +81,8 @@ class Santander240(Cnab240):
         vals['codigo_juros_mora'] = int(self.order.mode.boleto_mora)
         vals['juros_mora_data'] = self.format_date(line.ml_maturity_date)
         vals['juros_mora_taxa'] = Decimal("{0:,.2f}".format(float(self.order.mode.boleto_mora_juros)))
+        if int(self.order.mode.bank_id.bra_number_dig) == 0:
+            vals['cedente_agencia_dv'] = 1
 
         return vals
 
