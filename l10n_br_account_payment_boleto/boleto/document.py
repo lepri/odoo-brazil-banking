@@ -252,7 +252,9 @@ class BoletoStatander101201(Boleto):
 
     def __init__(self, move_line, nosso_numero):
         self.boleto = Boleto.getBoletoClass(move_line)()
-        self.account_number = move_line.payment_mode_id.bank_id.acc_number
+        # o self.account_number do santander e o numero do convenio
+        self.account_number = move_line.payment_mode_id.boleto_convenio
+        # self.account_number = move_line.payment_mode_id.bank_id.acc_number
         self.branch_number = move_line.payment_mode_id.bank_id.bra_number
         Boleto.__init__(self, move_line, nosso_numero) 
         self.boleto.ios = '0'
